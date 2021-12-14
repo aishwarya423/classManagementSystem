@@ -5,7 +5,7 @@ const { userauth, checkauth, customerauth } = require("../middleware/auth");
 const {
     signup,//based on role create user
     signin,//based on gmail login user
-    logout
+    logout 
 } = require("../controllers/authController");
 
 // router.get("/login", checkauth);
