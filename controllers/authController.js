@@ -3,22 +3,21 @@ const jwt = require("jsonwebtoken");
 const { Instructor } = require("../models/instructor");
 const { Student } = require("../models/student");
 
-// async function generateAuthToken(res, _id, name, subject, cart, wishList) {
-async function generateAuthToken(res, _id, name, email) {
+const { randomBytes,scrypt  } = require("crypto");
+
+async function generateAuthToken(res, _id ,role) {
   const expiration = 604800000;
   const token = jwt.sign(
-    { _id: _id, name: name, email: email },
+    { _id: _id ,role:role},
     process.env.jwtPrivateKey,
-    {
-      expiresIn: process.env.DB_ENV === "testing" ? "1d" : "7d",
-    }
+    { expiresIn: process.env.DB_ENV === "testing" ? "1d" : "7d",}
   );
   var obj = {
     token: token,
-    name: name,
     _id: _id,
-    email: email
+    role:role
   };
+  
   res.cookie("token", obj, {
     expires: new Date(Date.now() + expiration),
     httpOnly: true,
@@ -46,39 +45,36 @@ exports.logout = async (req, res) => {
 
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    let user = null
-    user = await Instructor.findOne({ email: email });
-    if(!user || user === undefined ){
-    user = await Student.findOne({ email: email });
-    }
-    if (user) {
+    const { name, email, password ,role} = req.body;
+    arr = ['instructor','student'] 
+    if(!name || !email || !password || !arr.includes(role)) return res.status(400).json({message:"Please pass all fields"})
+    let user = []
+    if(role == 'instructor'){
+      user = await Instructor.find({ email: email });
+    } else  user = await Student.find({ email: email });
+    if (user[0]) {
       return res.status(400).json({message:"User already exists with this email id"});
-    } else
-    if(req.body.role === "instructor"){
-      var newuser = await Instructor.create({
-        name: name,
-        email: email,
-        password: password,
-      });
-    } else if(req.body.role === "student"){
-      var newuser = await Student.create({
-        name: name,
-        email: email,
-        password: password,
-      });
     } else{
-      return res.status(400).json({message:"Please pass all fields"})//check
-    }
-    await generateAuthToken(
-      res,
-      newuser._id,
-      newuser.name,
-      email
-    );
-    newuser.active = true;
-    newuser.save();
-    return res.status(200).json({message:`${req.body.role} ${req.body.name} created successfully`,data:newuser});
+     var userObj = {} 
+     let result = ''
+      const salt = randomBytes(8).toString('hex');
+      scrypt(password,salt,32, async (err, derivedKey) => {
+        if (err) throw err;
+         result  = salt + '.' + derivedKey.toString('hex');
+        userObj = {
+          name: name,
+          email: email,
+          password:result
+        }
+        var newuser 
+        if(role === "instructor")  newuser = await Instructor.create(userObj);
+        else if(role === "student")  newuser = await Student.create(userObj);
+        newuser.token =  await generateAuthToken(res,newuser._id, role);
+        newuser.active = true;
+        newuser.save();
+        return res.status(200).json({message:`${role} ${name} created successfully`,data:newuser});
+        })
+  }
   } catch (err) {
     console.log(err);
     return res.status(500).json({message:`Error! try again later`});
@@ -86,27 +82,27 @@ exports.signup = async (req, res) => {
 };
 
 exports.signin = async (req, res) => { 
-  const { name, email, password } = req.body;
-  let user = null
-  user = await Instructor.findOne({ email: email });
-  if(!user || user === undefined ){
-  user = await Student.findOne({ email: email });
+  let user = []
+  const { email, password,role } = req.body;
+  if(role=='instructor'){
+    user = await Instructor.find({ email: email });
+  }else{
+  user = await Student.find({ email: email });
   }
-  if (!user || req.body.password != user.password) {
-    return res.status(400).json({message:"Invalid Email/Password"});
-  } 
-  const token = generateAuthToken(
-    res,
-    user._id,
-    user.name,
-    email
-  );
-  console.log(token, res,
-    user._id,
-    user.name,
-    email,"tokennn")
-  user.token = token;
-  user.active = true;
-  user.save();
-  return res.status(200).json({message:"Successfully logged in",data:user});
+  if(!user.length){
+    return res.status(400).json({message:"User dose not exists, would you like to sign up for our app?"});
+  }else{
+    const [salt , storedHash] = user[0].password.split('.');
+    scrypt(password,salt,32,async (err, derivedKey) => {
+      if (err) throw err;
+    if(derivedKey.toString('hex') !== storedHash) return res.status(400).json({message:"Invalid password"});
+    else{
+      const token = await generateAuthToken(res,user._id, user.role);
+      user[0].token = token;
+      user[0].active = true;
+      user[0].save();
+      return res.status(200).json({message:"Successfully logged in",data:user[0]});
+    }
+     });
+    }
 };

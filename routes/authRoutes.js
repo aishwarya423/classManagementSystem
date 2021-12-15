@@ -1,7 +1,7 @@
 // /api/auth/'route'
 const express = require("express");
 const router = express.Router();
-const { userauth, checkauth, customerauth } = require("../middleware/auth");
+const { checkAuth } = require("../middleware/auth");
 const {
     signup,//based on role create user
     signin,//based on gmail login user
@@ -17,6 +17,6 @@ const {
 
 router.post("/signup", signup);
 router.post("/signin", signin);
-router.get("/logout", userauth, logout);
+router.get("/logout", checkAuth, logout);
 
 module.exports = router;

@@ -7,19 +7,19 @@ var instructorSchema = new mongoose.Schema(
       required: true,
       minlength: 3,
       maxlength: 50,
-    },
-    email: {
-        type: String,
-        required: true,
-        minlength: 4,
-        // unique: true,
+      },
+      email: {
+      type: String,
+      required: true,
+      minlength: 4,
+      // unique: true,
       },
       password: {
-        type: String,
+      type: String,
         required: true,
       },
       token:{type:String,default:"NA"},
-    specification: { type: String },
+      specification: { type: String },
     classes: [
         {
           type: mongoose.Schema.Types.ObjectId,

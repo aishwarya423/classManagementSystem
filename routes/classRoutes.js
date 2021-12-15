@@ -3,14 +3,16 @@ const router = express.Router();
 const {
     addClass,getClasses,getClass,editClass,deleteClass
 } = require("../controllers/classController");
+const {  checkAuth, studentAuth,instructorAuth } = require("../middleware/auth");
+
 
 //c
-router.post("/create-class",addClass);
+router.post("/create-class", instructorAuth, addClass);
 //r
-router.get("/classes", getClasses);
-router.get("/class/:id",getClass );
-router.post("/edit",editClass );
-router.post("/delete/:id",deleteClass );
+router.get("/classes",checkAuth,getClasses);
+router.get("/class-details/:id", checkAuth, getClass );
+router.post("/edit", instructorAuth, editClass );
+router.delete("/:id", instructorAuth,deleteClass );
 
 
 module.exports = router;

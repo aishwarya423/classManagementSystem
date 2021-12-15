@@ -16,7 +16,7 @@ const classRoutes = require("./routes/classRoutes");
 
 
 //middleware
-const { checkauth } = require("./middleware/auth");
+const { checkAuth } = require("./middleware/auth");
 
 //models
 const { Class } = require("./models/class");
@@ -62,7 +62,7 @@ app.get("/", async (req, res) => {
 });
 
 
-app.get("/cookie", checkauth, function (req, res) {
+app.get("/cookie", checkAuth, function (req, res) {
   console.log("Cookies: ", req.cookies);
   res.clearCookie();
   console.log("Signed Cookies: ");
