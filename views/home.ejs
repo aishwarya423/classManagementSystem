@@ -1,0 +1,50 @@
+<html>
+ <%=currentUser%>
+  Class management system project  <br><br><br>
+ <%if(!user){%>
+
+  ---Sign up
+    <form action="../auth/signup"  method="POST">
+  <input type="text" name="name" placeholder="name"> <br>
+  <input type="text" name="email" placeholder="email">   <br>
+  <input type="password" name="password" placeholder="password">  <br>
+  <select name="role" >
+    <option selected value="instructor">instructor</option> 
+    <option value="student">student</option>
+  </select> <br>
+
+ <button type="submit">Signup</button>
+</form>
+---Sign in
+
+<form action="../auth/signin" method="POST">
+    <input type="text" name="email" placeholder="email">   <br>
+    <input type="password" name="password" placeholder="password"><br>
+    <select name="role" >
+      <option selected value="instructor">instructor</option> 
+      <option value="student">student</option>
+    </select> <br>
+   <button type="submit">SignIn</button>
+  </form>
+</html>
+<%}%>
+
+<%if(user){%>
+  <form action="../class/create-class" method="POST">
+Title        :<input type="text" name ="title" value="World war-II"> <br>
+Description  :<input type="text" name ="description"  value="4th unit introduction"> <br>
+Category     :<input type="text" name ="category"  value="Social"> <br>
+Hours        :<input type="text" name ="hours"  value="1hr"> <br>
+StartsAt     :<input type="text" name ="startsAt"  value="2 PM"> <br>
+EndsAt       :<input type="text" name ="endsAt"  value="3 PM"> <br>
+<input type="hidden" name ="instructor"  value=""> <br>
+<button type="submit">Create Class</button> <br>
+</form>
+<a href="../class/my-classes">
+  <button>My Classes</button> <br><br>
+</a>
+<%}%>
+
+<a href="../auth/logout">
+  <button>Logout</button>
+</a>

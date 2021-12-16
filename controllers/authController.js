@@ -35,7 +35,7 @@ exports.logout = async (req, res) => {
        user = await Instructor.findOne({ _id: req.user._id });
       }
       user.active = false;
-      user.phoneToken = "";
+      user.token = "";
       user.save();
       res.clearCookie("token");
     return res.status(200).json({message:"Logged Out successfully"});
@@ -55,7 +55,7 @@ exports.signup = async (req, res) => {
       user = await Instructor.find({ email: email });
     } else  user = await Student.find({ email: email });
     if (user[0]) {
-      return res.status(400).json({message:"User already exists with this email id"});
+      return res.status(409).json({message:"User already exists with this email id"});
     } else{
      var userObj = {} 
      let result = ''
@@ -74,6 +74,8 @@ exports.signup = async (req, res) => {
         newuser.token =  await generateAuthToken(res,newuser._id, role,name);
         newuser.active = true;
         newuser.save();
+        req.user = newuser;   
+        res.locals.currentUser = newuser;
         return res.status(200).json({message:`${role} ${name} created successfully`,data:newuser});
         })
   }
@@ -84,7 +86,7 @@ exports.signup = async (req, res) => {
 };
 
 exports.signin = async (req, res) => { 
-  let user = []
+  let user = [];
   const { email, password,role } = req.body;
   if(role=='instructor'){
     user = await Instructor.find({ email: email });
@@ -103,6 +105,8 @@ exports.signin = async (req, res) => {
       user[0].token = token;
       user[0].active = true;
       user[0].save();
+      req.user = user[0];
+      res.locals.currentUser = user[0]; 
       return res.status(200).json({message:"Successfully logged in",data:user[0]});
     }
      });

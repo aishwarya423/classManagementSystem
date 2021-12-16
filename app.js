@@ -8,6 +8,10 @@ const cors = require("cors");
 const axios = require("axios"); 
 const morgan = require("morgan");
 const moment = require("moment");
+
+app.set("view engine", "ejs");
+app.set("views", "./views");
+
   
 //Routes
 const authenticationRoutes = require("./routes/authRoutes");
@@ -47,7 +51,7 @@ app.use(flash());
 // app.use(moment());
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
-  res.locals.moment = moment
+  res.locals.moment = moment;
   next();
 });
 
@@ -59,8 +63,15 @@ app.use("/auth", authenticationRoutes);
 
 
 app.get("/", async (req, res) => {
+  const user = req.headers.cookie
+  console.log(user,"user from cookie")
+  return res.render('home',{user});
 });
-
+app.get("/page/:page", async (req, res) => {
+  const user = req.headers.cookie
+  console.log(user)
+  return res.render(req.params.page,{user});
+});
 
 app.get("/cookie", checkAuth, function (req, res) {
   console.log("Cookies: ", req.cookies);
