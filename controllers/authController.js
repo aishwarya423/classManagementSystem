@@ -5,7 +5,7 @@ const { Student } = require("../models/student");
 
 const { randomBytes,scrypt  } = require("crypto");
 
-async function generateAuthToken(res, _id ,role) {
+async function generateAuthToken(res, _id ,role,name) {
   const expiration = 604800000;
   const token = jwt.sign(
     { _id: _id ,role:role},
@@ -15,7 +15,8 @@ async function generateAuthToken(res, _id ,role) {
   var obj = {
     token: token,
     _id: _id,
-    role:role
+    role:role,
+    name:name
   };
   
   res.cookie("token", obj, {
@@ -40,6 +41,7 @@ exports.logout = async (req, res) => {
     return res.status(200).json({message:"Logged Out successfully"});
     } catch (err) {
       console.log(err);
+    return res.status(500).json({message:"Error try again later"});
     }
 };
 
@@ -69,7 +71,7 @@ exports.signup = async (req, res) => {
         var newuser 
         if(role === "instructor")  newuser = await Instructor.create(userObj);
         else if(role === "student")  newuser = await Student.create(userObj);
-        newuser.token =  await generateAuthToken(res,newuser._id, role);
+        newuser.token =  await generateAuthToken(res,newuser._id, role,name);
         newuser.active = true;
         newuser.save();
         return res.status(200).json({message:`${role} ${name} created successfully`,data:newuser});
@@ -97,7 +99,7 @@ exports.signin = async (req, res) => {
       if (err) throw err;
     if(derivedKey.toString('hex') !== storedHash) return res.status(400).json({message:"Invalid password"});
     else{
-      const token = await generateAuthToken(res,user._id, user.role);
+      const token = await generateAuthToken(res,user[0]._id, user[0].role,user[0].name);
       user[0].token = token;
       user[0].active = true;
       user[0].save();

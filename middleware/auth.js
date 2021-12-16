@@ -56,11 +56,11 @@ console.log(token,"tokkkkkkkkken")
 
 
 exports.checkAuth = async (req, res, next) => {
-  console.log("reqqqq",req.headers.authorization) 
-let token = req.headers.authorization.split(' ')
-token = token[1]
-console.log(token,"tokkkkkkkkken")
   try {
+    console.log("reqqqq",req.headers.authorization) 
+    let token = req.headers.authorization.split(' ')
+    token = token[1]
+    console.log(token,"tokkkkkkkkken")
     if (!token) {
       return res.status(409).send("access denied. No token Provided");
     }else {
@@ -78,7 +78,8 @@ console.log(token,"tokkkkkkkkken")
     next();
   } catch (e) {
     console.log(e);
-    res.clearCookie("token");
+    // res.clearCookie("token");
+    return res.status(400).send("access denied. No token Provided");
   }
 };
 

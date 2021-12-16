@@ -20,6 +20,7 @@ var instructorSchema = new mongoose.Schema(
       },
       token:{type:String,default:"NA"},
       specification: { type: String },
+      active:Boolean,
     classes: [
         {
           type: mongoose.Schema.Types.ObjectId,

@@ -3,17 +3,10 @@ const express = require("express");
 const router = express.Router();
 const { checkAuth } = require("../middleware/auth");
 const {
-    signup,//based on role create user
-    signin,//based on gmail login user
+    signup,
+    signin,
     logout 
 } = require("../controllers/authController");
-
-// router.get("/login", checkauth);
- 
-// router.post("/signup", getUser);
-  
-// router.get("/logout", userauth, logoutUser);
-
 
 router.post("/signup", signup);
 router.post("/signin", signin);
