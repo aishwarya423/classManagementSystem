@@ -19,6 +19,7 @@ var studentSchema = new mongoose.Schema(
         required: true,
     },
     active:Boolean,
+    role:String,
     token:{type:String,default:"NA"},
     classes: [
         {

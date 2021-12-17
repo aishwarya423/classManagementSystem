@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-    addClass,getClasses,getClass,editClass,deleteClass ,getMyClasses
+    addClass,getClasses,getClass,editClass,deleteClass ,getMyClasses,registerClass
 } = require("../controllers/classController");
 const {  checkAuth, studentAuth,instructorAuth } = require("../middleware/auth");
 
@@ -12,6 +12,7 @@ router.get("/my-classes", checkAuth, getMyClasses);
 
 router.post("/edit", instructorAuth, editClass );
 router.delete("/:id", instructorAuth,deleteClass );
+router.get("/register/:id",studentAuth, registerClass );
 
 
 module.exports = router;

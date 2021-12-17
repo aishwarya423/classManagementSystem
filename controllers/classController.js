@@ -22,8 +22,17 @@ exports.getMyClasses = async (req, res) => {
 
 
 exports.getClass = async (req, res) => {
-  const classdetails = await Class.findById(req.params.id);
+  const classdetails = await Class.findOne({_id:req.params.id});
+  if(req.user.role == 'student'){
+   classdetails = await Class.findOne({_id:req.params.id},{studentsRegistered:0});
+  }
   return res.status(200).json({ message: "Class", response: classdetails });
+};
+
+
+exports.registerClass = async (req, res) => {
+  const classdetails = await Class.findOneAndUpdate({_id:req.params.id},{$push:{ studentsRegistered: req.user._id }});
+  return res.status(200).json({ message: "Class registered Successfully", response: classdetails });
 };
 // collection.update({ "code": req.body.code },{$set:  req.body.updatedFields}, function(err, results) {
 //    res.send({error: err, affected: results});
@@ -68,6 +77,7 @@ exports.addClass = async (req, res) => {
     var x = await Class.create(data);
     var instruct = await Instructor.findOne({ _id: req.user._id });
     instruct.classes.push(x._id);
+    instruct.save();
     console.log(x);
     return res
       .status(200)

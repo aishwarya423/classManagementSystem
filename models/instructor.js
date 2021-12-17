@@ -19,6 +19,7 @@ var instructorSchema = new mongoose.Schema(
         required: true,
       },
       token:{type:String,default:"NA"},
+      role:String,
       specification: { type: String },
       active:Boolean,
     classes: [

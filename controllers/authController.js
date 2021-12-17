@@ -72,6 +72,7 @@ exports.signup = async (req, res) => {
         if(role === "instructor")  newuser = await Instructor.create(userObj);
         else if(role === "student")  newuser = await Student.create(userObj);
         newuser.token =  await generateAuthToken(res,newuser._id, role,name);
+        newuser.role = role;
         newuser.active = true;
         newuser.save();
         req.user = newuser;   
@@ -101,8 +102,9 @@ exports.signin = async (req, res) => {
       if (err) throw err;
     if(derivedKey.toString('hex') !== storedHash) return res.status(400).json({message:"Invalid password"});
     else{
-      const token = await generateAuthToken(res,user[0]._id, user[0].role,user[0].name);
-      user[0].token = token;
+     console.log(res,user[0]._id, user[0].role,user[0].name,"lll")
+      user[0].role = role;
+      user[0].token = await generateAuthToken(res,user[0]._id, user[0].role,user[0].name);
       user[0].active = true;
       user[0].save();
       req.user = user[0];
