@@ -63,9 +63,10 @@ app.use("/auth", authenticationRoutes);
 
 
 app.get("/", async (req, res) => {
-  const user = req.headers.cookie
-  console.log(user,"user from cookie")
-  return res.render('home',{user});
+  // const user = req.headers.cookie
+  // console.log(user,"user from cookie")
+  // return res.render('home',{user});
+  return res.send("Welcome to class management api")
 });
 app.get("/page/:page", async (req, res) => {
   const user = req.headers.cookie
@@ -79,6 +80,6 @@ app.get("/cookie", checkAuth, function (req, res) {
   console.log("Signed Cookies: ");
 });
  
-// app.listen(port, "0.0.0.0", () => console.log(`Hello to ${port}`));
-app.listen(3013, () => console.log(`Hello to ${port}`));
+app.listen(port, "0.0.0.0", () => console.log(`Hello to ${port}`));
+// app.listen(port, () => console.log(`Hello to ${port}`));
 
